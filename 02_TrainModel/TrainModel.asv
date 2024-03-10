@@ -2,7 +2,7 @@ clear;
 close all;
 clc;
 %% Check if Model Training Data exists
-dataFile = 'Model_Data_U2_X1_N28.mat';
+dataFile = 'Model_Data_U2_X1_N14.mat';
 
 if isfile(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
     load(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
@@ -24,7 +24,7 @@ rng('default')
 
 % Define state network
 sys.StateNetwork = createMLPNetwork(sys,'state',...
-    LayerSize = [128 128],...
+    LayerSize = [64 64 64],... %[128 128],...
     Activations = "tanh",...
     WeightsInitializer = "glorot",...
     BiasInitializer = "zeros");
@@ -38,7 +38,7 @@ sys.StateNetwork = createMLPNetwork(sys,'state',...
 
 %% Training of NSSM
 options = nssTrainingOptions('sgdm');
-options.MaxEpochs = 800;
+options.MaxEpochs = 400;
 options.MiniBatchSize = N;
 
 tic

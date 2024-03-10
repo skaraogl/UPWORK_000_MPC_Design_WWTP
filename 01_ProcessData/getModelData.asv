@@ -1,4 +1,4 @@
-function [DataM,U,Y] = getModelData(Data)
+function [DataM,U,Y] = getModelData(Data, N_uN_x)
 %GETMODELDATA Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -25,11 +25,29 @@ U = cell(N, 1);
 Y = cell(N, 1);
 
 for i = 1:N
-    if M-2 == 1
+    if (M - 2) == 1
         U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),'VariableNames',"u");
-        Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,3),'VariableNames',"y");
+        Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,end),'VariableNames',"y");
+    elseif (M - 2) == 3 && N_x == 0
+        U{i} = timetable(seconds(DataM{i}(:,1)),...
+            DataM{i}(:,2),...
+            DataM{i}(:,3),...
+            DataM{i}(:,4),'VariableNames', ["u1","u2","u3"]);
+        Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,end),'VariableNames',"y");
+    elseif N_x == 4
+        U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),'VariableNames',"u");
+        Y{i} = timetable(seconds(DataM{i}(:,1)),...
+            DataM{i}(:,3),...
+            DataM{i}(:,4),...
+            DataM{i}(:,5),...
+            DataM{i}(:,6),'VariableNames', ["x1","x2","x3","x4"]);
     else
-        U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2:M-1),'VariableNames',"u");
+        U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),'VariableNames',"u");
+        Y{i} = timetable(seconds(DataM{i}(:,1)),...
+            DataM{i}(:,3),...
+            DataM{i}(:,4),...
+            DataM{i}(:,5),'VariableNames', ["x1","x2","x3"]);
+    end
 end
 
 end

@@ -1,6 +1,6 @@
+%% Load Data
 clear;
 clc;
-%% Load Data
 load('C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\00_RawData\Data_2024_03_08.mat')
 
 %% INPUTS
@@ -9,7 +9,7 @@ N_u = 2;
 % Number of states to be used
 N_x = 1;
 % Number of experiments/ days
-N = 7*2*2; 
+N = 7; 
 % Use normalized data set / boolean
 I_n = 1;
 
@@ -67,17 +67,15 @@ end
 [~,U,Y] = getModelData(DataCol, N_u, N_x);
 
 %% Split Data into Training and Testing Data
-% if ~exist('U_T','var') 
-%     U_T = U{end};
-%     Y_T = Y{end};
-% 
-%     U = {U{1:end-1}}';
-%     Y = {Y{1:end-1}}';
-% 
-%     save(['Model_Data_U',num2str(N_u),'_X',num2str(N_x),'.mat'],'U','Y','U_T','Y_T','Norm')
-% end
+if ~exist('U_T','var') 
+    U_T = U{end};
+    Y_T = Y{end};
+    
+    U = {U{1:end-1}}';
+    Y = {Y{1:end-1}}';
 
-save(['Model_Data_U',num2str(N_u),'_X',num2str(N_x),'_N',num2str(N),'.mat'],'U','Y','DataRep','Norm')
+    save(['Model_Data_U',num2str(N_u),'_X',num2str(N_x),'.mat'],'U','Y','U_T','Y_T','Norm')
+end
 
 %% Clear Workspace
-clearvars -except U Y;
+clearvars -except U U_T Y Y_T;
