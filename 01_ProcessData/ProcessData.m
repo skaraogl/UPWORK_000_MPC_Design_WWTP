@@ -5,11 +5,11 @@ load('C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\00_RawData\Data_
 
 %% INPUTS
 % Number of inputs to be used
-N_u = 2;
+N_u = 1;
 % Number of states to be used
-N_x = 1;
+N_x = 3;
 % Number of experiments/ days
-N = 7*2*2; 
+N = 7*2; 
 % Use normalized data set / boolean
 I_n = 1;
 
@@ -19,7 +19,7 @@ if N_u == 1 && N_x == 0
     DataRep = [Data.t_Day,...
             Data.DO,...
             Data.TNout];
-elseif N_u == 3 || (N_u == 1 && N_x == 2)
+elseif N_u == 1 || N_u == 3
     DataRep = [Data.t_Day,...
         Data.DO,...
         Data.NO,...

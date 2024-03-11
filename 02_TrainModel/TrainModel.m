@@ -1,8 +1,9 @@
 clear;
 close all;
 clc;
-%% Check if Model Training Data exists
-dataFile = 'Model_Data_U2_X1_N28.mat';
+%% Check if 
+% Model Training Data exists
+dataFile = 'Model_Data_U2_X1_N14.mat';
 
 if isfile(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
     load(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
@@ -19,7 +20,7 @@ N_u = 2;
 N_x = 1;
 
 % NSS system
-sys = idNeuralStateSpace(N_x,"NumInputs",N_u);
+sys = idNeuralStateSpace(N_x,"NumInputs",N_u,"NumOutputs",N_x);
 rng('default')
 
 % Define state network
@@ -38,7 +39,7 @@ sys.StateNetwork = createMLPNetwork(sys,'state',...
 
 %% Training of NSSM
 options = nssTrainingOptions('sgdm');
-options.MaxEpochs = 800;
+options.MaxEpochs = 400;
 options.MiniBatchSize = N;
 
 tic
@@ -57,12 +58,22 @@ end
 fig_width = 1600;
 fig_height = 800;
 
-U_all = timetable(seconds(DataRep(:,1)),...
-    DataRep(:,2),...
-    DataRep(:,3),'VariableNames',["u1","u2"]);
-
-Y_all = timetable(seconds(DataRep(:,1)),...
-    DataRep(:,end),'VariableNames',"y");
+if N_u == 2 && N_x == 1
+    U_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,2),...
+        DataRep(:,3),'VariableNames',["u1","u2"]);
+    
+    Y_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,end),'VariableNames',"y");
+elseif N_u == 1 && N_x == 3
+    U_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,2),'VariableNames',"u");
+    
+    Y_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,3),...
+        DataRep(:,4),...
+        DataRep(:,end),'VariableNames',["y1","y2","y3"]);
+end
 
 fig_comp = figure("Position",[100 100, fig_width fig_height],"Name",'Model Validation');
 compare([U_all,Y_all],sys)
