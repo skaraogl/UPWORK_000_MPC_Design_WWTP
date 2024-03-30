@@ -24,13 +24,18 @@ U = cell(N, 1);
 Y = cell(N, 1);
 
 for i = 1:N
-    if N_u == 1 && N_x == 0
+    if N_u == 1 && N_x == 1
         U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),'VariableNames',"u");
         Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,end),'VariableNames',"y");
     elseif N_u == 2 && N_x == 1
         U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),...
             DataM{i}(:,3),'VariableNames',["u1","u2"]);
         Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,end),'VariableNames',"y");
+    elseif N_u == 2 && N_x == 2
+        U{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,2),...
+            DataM{i}(:,3),'VariableNames',["u1","u2"]);
+        Y{i} = timetable(seconds(DataM{i}(:,1)),DataM{i}(:,end-1),...
+            DataM{i}(:,end),'VariableNames',["y1","y2"]);
     elseif N_u == 3 && N_x == 1
         U{i} = timetable(seconds(DataM{i}(:,1)),...
             DataM{i}(:,2),...

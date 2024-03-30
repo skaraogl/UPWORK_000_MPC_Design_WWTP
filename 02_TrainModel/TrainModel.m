@@ -1,9 +1,8 @@
 clear;
 close all;
 clc;
-%% Check if 
-% Model Training Data exists
-dataFile = 'Model_Data_U2_X1_N14.mat';
+%% Check if Model Training Data exists
+dataFile = 'Model_Data_UDO&NH_XNO&TNout_N480_DataSegm.mat';
 
 if isfile(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
     load(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\',dataFile])
@@ -17,7 +16,7 @@ N = length(Y) - 1;
 % Number of inputs
 N_u = 2;
 % Number of states
-N_x = 1;
+N_x = 2;
 
 % NSS system
 sys = idNeuralStateSpace(N_x,"NumInputs",N_u,"NumOutputs",N_x);
@@ -39,8 +38,9 @@ sys.StateNetwork = createMLPNetwork(sys,'state',...
 
 %% Training of NSSM
 options = nssTrainingOptions('sgdm');
-options.MaxEpochs = 400;
+options.MaxEpochs = 340;
 options.MiniBatchSize = N;
+options.InputInterSample = 'pchip';
 
 tic
 sys = nlssest(U,Y,sys,options,UseLastExperimentForValidation=true);
@@ -65,6 +65,14 @@ if N_u == 2 && N_x == 1
     
     Y_all = timetable(seconds(DataRep(:,1)),...
         DataRep(:,end),'VariableNames',"y");
+elseif N_u == 2 && N_x == 2
+    U_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,2),...
+        DataRep(:,3),'VariableNames',["u1","u2"]);
+    
+    Y_all = timetable(seconds(DataRep(:,1)),...
+        DataRep(:,end-1),...
+        DataRep(:,end),'VariableNames',["y1","y2"]);
 elseif N_u == 1 && N_x == 3
     U_all = timetable(seconds(DataRep(:,1)),...
         DataRep(:,2),'VariableNames',"u");
@@ -78,11 +86,11 @@ end
 fig_comp = figure("Position",[100 100, fig_width fig_height],"Name",'Model Validation');
 compare([U_all,Y_all],sys)
 
-if ~isfile(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\Valid',...
-    dataFile(11:end),'.fig'])
-    saveas(fig_comp, ['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\Valid',...
-        dataFile(11:end),'.fig'])
-    saveas(fig_comp, ['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\Valid',...
-        dataFile(11:end),'.png'])
-end
+% if ~isfile(['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\Valid',...
+%     dataFile(11:end),'.fig'])
+    saveas(fig_comp, ['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\FIG\Valid',...
+        dataFile(11:end-4),char(datetime('now','Format','yyyyMMdd_HHmm')),'.fig'])
+    saveas(fig_comp, ['C:\Users\Selim\SK_Code\UPWORK_000_MeskJan_MPC_Design_WWTP\01_ProcessData\00_Figures\PNG\Valid',...
+        dataFile(11:end-4),char(datetime('now','Format','yyyyMMdd_HHmm')),'.png'])
+% end
 clear fig_comp
